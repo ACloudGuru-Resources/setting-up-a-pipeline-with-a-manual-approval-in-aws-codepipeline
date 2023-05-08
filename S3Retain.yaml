@@ -10,11 +10,34 @@ Resources:
   S3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      AccessControl: PublicRead
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: error.html
     DeletionPolicy: Retain
+  S3BucketBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: S3Bucket
+      PolicyDocument:
+        Statement:
+        - Sid: PublicRead
+          Effect: Allow
+          Principal: "*"
+          Action:
+          - s3:GetObject
+          Resource:
+          - Fn::Join:
+            - ''
+            - - Fn::GetAtt:
+                - S3Bucket
+                - Arn
+              - "/*"
 Outputs:
   WebsiteURL:
     Value: !GetAtt 
